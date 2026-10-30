@@ -1,0 +1,5 @@
+{
+  "headers": [
+    { "source": "/(data.js|data_bin.js|data_bin2.js)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] }
+  ]
+}
