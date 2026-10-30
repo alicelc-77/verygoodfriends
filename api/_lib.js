@@ -46,9 +46,14 @@ async function limit(req, key, max, secs) {
   } catch (e) { return true; } // never block on a redis hiccup
 }
 
+// give one attempt back (used when sending failed, so a failed order never counts against the visitor)
+async function refund(req, key) {
+  try { await redis(['DECR', 'vgf:rl:' + key + ':' + ip(req)]); } catch (e) {}
+}
+
 async function body(req) {
   if (req.body && typeof req.body === 'object') return req.body;
   try { return JSON.parse(req.body || '{}'); } catch (e) { return {}; }
 }
 
-module.exports = { redis, sendMail, esc, clean, ip, sign, limit, body };
+module.exports = { redis, sendMail, esc, clean, ip, sign, limit, refund, body };

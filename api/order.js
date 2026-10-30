@@ -1,5 +1,5 @@
 // POST /api/order  -> emails you the order request. Reply to that email to reach the customer.
-const { sendMail, esc, clean, limit, body } = require('./_lib');
+const { sendMail, esc, clean, limit, refund, body } = require('./_lib');
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL'];
 
@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
   if (!items.length) return res.status(400).json({ error: 'missing item' });
   if (items.some((x) => !x.item)) return res.status(400).json({ error: 'missing item' });
   if (items.some((x) => !SIZES.includes(x.size))) return res.status(400).json({ error: 'please pick a size' });
-  if (!(await limit(req, 'order', 5, 3600))) return res.status(429).json({ error: 'too many requests, try again later' });
+  if (!(await limit(req, 'order', 30, 3600))) return res.status(429).json({ error: 'too many requests, try again later' });
 
   const sw = (x) => (x.color ? '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + x.color + ';border:1px solid #888;vertical-align:middle"></span> ' + x.color + (x.colorFor ? ' (' + esc(x.colorFor) + ')' : '') : '-');
   const head = '<tr><th align="left">Item</th><th align="left">Cut</th><th align="left">Colour</th><th align="left">Size</th><th align="left">Qty</th></tr>';
@@ -40,6 +40,7 @@ module.exports = async (req, res) => {
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error(e);
+    await refund(req, 'order'); // a failed send doesn't count
     return res.status(500).json({ error: 'could not send right now, please try again or email me directly' });
   }
 };
