@@ -1,5 +1,7 @@
 {
   "headers": [
-    { "source": "/(data.js|data_bin.js|data_bin2.js)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] }
+    { "source": "/(data.js|data_hi.js|data_bin.js|data_bin2.js)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "source": "/img/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "source": "/fonts/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
   ]
 }
